@@ -50,7 +50,7 @@ public class CounterController {
 
 
   /**
-   * 更新计数，自增或者清零
+   * 更新计数，自增、清零或乘10
    * @param request {@link CounterRequest}
    * @return API response json
    */
@@ -60,9 +60,20 @@ public class CounterController {
 
     Optional<Counter> curCounter = counterService.getCounter(1);
     if (request.getAction().equals("inc")) {
-      Integer count = 1;
+      Integer count = 10;
       if (curCounter.isPresent()) {
         count += curCounter.get().getCount();
+      }
+      Counter counter = new Counter();
+      counter.setId(1);
+      counter.setCount(count);
+      counterService.upsertCount(counter);
+      return ApiResponse.ok(count);
+    } else if (request.getAction().equals("multiply")) {
+      // 新增乘10功能
+      Integer count = 10; // 默认从10开始
+      if (curCounter.isPresent()) {
+        count = curCounter.get().getCount() * 10;
       }
       Counter counter = new Counter();
       counter.setId(1);
@@ -76,7 +87,7 @@ public class CounterController {
       counterService.clearCount(1);
       return ApiResponse.ok(0);
     } else {
-      return ApiResponse.error("参数action错误");
+      return ApiResponse.error("参数action错误，支持的动作：inc(自增)、multiply(乘10)、clear(清零)");
     }
   }
   
