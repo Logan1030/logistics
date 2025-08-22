@@ -64,7 +64,7 @@ public class CounterController {
       if (curCounter.isPresent()) {
         count += curCounter.get().getCount();
       }
-      logger.info("count: {} yubin", count);
+      logger.info("count: {} long", count);
       Counter counter = new Counter();
       counter.setId(1);
       counter.setCount(count);
