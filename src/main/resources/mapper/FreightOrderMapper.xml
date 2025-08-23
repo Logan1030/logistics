@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tencent.wxcloudrun.dao.FreightOrderMapper">
+
+    <!-- 运费订单结果映射 -->
+    <resultMap id="freightOrderResultMap" type="com.tencent.wxcloudrun.model.FreightOrder">
+        <id property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="senderCity" column="sender_city"/>
+        <result property="receiverCity" column="receiver_city"/>
+        <result property="receiverName" column="receiver_name"/>
+        <result property="cargoCode" column="cargo_code"/>
+        <result property="cargoType" column="cargo_type"/>
+        <result property="vehicleType" column="vehicle_type"/>
+        <result property="freightResult" column="freight_result"/>
+        <result property="billingWeight" column="billing_weight"/>
+        <result property="costStatistics" column="cost_statistics"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime"/>
+        <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime"/>
+    </resultMap>
+
+    <!-- 运费订单详情结果映射 -->
+    <resultMap id="freightOrderDetailResultMap" type="com.tencent.wxcloudrun.model.FreightOrderDetail">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="detailType" column="detail_type"/>
+        <result property="detailKey" column="detail_key"/>
+        <result property="detailValue" column="detail_value"/>
+        <result property="detailUnit" column="detail_unit"/>
+        <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime"/>
+    </resultMap>
+
+    <!-- 插入运费订单 -->
+    <insert id="insertFreightOrder" parameterType="com.tencent.wxcloudrun.model.FreightOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `freight_orders` (
+            `order_no`, `sender_city`, `receiver_city`, `receiver_name`,
+            `cargo_code`, `cargo_type`, `vehicle_type`, `freight_result`,
+            `billing_weight`, `cost_statistics`, `total_amount`, `status`, `remark`
+        ) VALUES (
+            #{orderNo}, #{senderCity}, #{receiverCity}, #{receiverName},
+            #{cargoCode}, #{cargoType}, #{vehicleType}, #{freightResult},
+            #{billingWeight}, #{costStatistics}, #{totalAmount}, #{status}, #{remark}
+        )
+    </insert>
+
+    <!-- 根据ID查询运费订单 -->
+    <select id="getFreightOrderById" resultMap="freightOrderResultMap" parameterType="java.lang.Long">
+        SELECT * FROM `freight_orders` WHERE id = #{id}
+    </select>
+
+    <!-- 根据订单编号查询运费订单 -->
+    <select id="getFreightOrderByOrderNo" resultMap="freightOrderResultMap" parameterType="java.lang.String">
+        SELECT * FROM `freight_orders` WHERE order_no = #{orderNo}
+    </select>
+
+    <!-- 更新运费订单 -->
+    <update id="updateFreightOrder" parameterType="com.tencent.wxcloudrun.model.FreightOrder">
+        UPDATE `freight_orders` SET
+            `sender_city` = #{senderCity},
+            `receiver_city` = #{receiverCity},
+            `receiver_name` = #{receiverName},
+            `cargo_code` = #{cargoCode},
+            `cargo_type` = #{cargoType},
+            `vehicle_type` = #{vehicleType},
+            `freight_result` = #{freightResult},
+            `billing_weight` = #{billingWeight},
+            `cost_statistics` = #{costStatistics},
+            `total_amount` = #{totalAmount},
+            `status` = #{status},
+            `remark` = #{remark},
+            `updated_at` = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除运费订单 -->
+    <delete id="deleteFreightOrder" parameterType="java.lang.Long">
+        DELETE FROM `freight_orders` WHERE id = #{id}
+    </delete>
+
+    <!-- 查询运费订单列表 -->
+    <select id="getFreightOrderList" resultMap="freightOrderResultMap">
+        SELECT * FROM `freight_orders`
+        <where>
+            <if test="senderCity != null and senderCity != ''">
+                AND sender_city = #{senderCity}
+            </if>
+            <if test="receiverCity != null and receiverCity != ''">
+                AND receiver_city = #{receiverCity}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 插入运费订单详情 -->
+    <insert id="insertFreightOrderDetail" parameterType="com.tencent.wxcloudrun.model.FreightOrderDetail" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `freight_order_details` (
+            `order_id`, `detail_type`, `detail_key`, `detail_value`, `detail_unit`
+        ) VALUES (
+            #{orderId}, #{detailType}, #{detailKey}, #{detailValue}, #{detailUnit}
+        )
+    </insert>
+
+    <!-- 根据订单ID查询详情列表 -->
+    <select id="getFreightOrderDetailsByOrderId" resultMap="freightOrderDetailResultMap" parameterType="java.lang.Long">
+        SELECT * FROM `freight_order_details` WHERE order_id = #{orderId} ORDER BY detail_type, id
+    </select>
+
+    <!-- 删除运费订单详情 -->
+    <delete id="deleteFreightOrderDetailsByOrderId" parameterType="java.lang.Long">
+        DELETE FROM `freight_order_details` WHERE order_id = #{orderId}
+    </delete>
+
+</mapper>
